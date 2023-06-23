@@ -1,0 +1,18 @@
+### Create d1.andrea@icloud.com
+POST http://{{host}}:{{port}}/users
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Andrea",
+  "surname": "Boccia",
+  "email": "d1.andrea@icloud.com",
+  "password": "{{$random.alphanumeric(20)}}",
+  "roleKey": "wineHQ88"
+}
+
+> {%
+    client.global.set('andreasID', response.body._id);
+    client.global.set('andreasPassword', JSON.parse(request.body()).password);
+%}
+

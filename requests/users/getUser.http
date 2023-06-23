@@ -1,0 +1,8 @@
+### Get all users
+GET http://{{host}}:{{port}}/users
+Accept: application/json
+
+
+### Get d1.andrea@icloud.com
+GET http://{{host}}:{{port}}/users/{{andreasID}}
+Accept: application/json
