@@ -2,6 +2,15 @@ const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const debug = require('debug')('gdoen-drive-backend:server');
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.mongoURL)
+    .then( () => debug('Connected to DB'))
+    .catch( () => {
+      console.error('Couldn\'t connect to DB');
+      process.exit(1);
+    })
 
 const usersRouter = require('./routes/users');
 
