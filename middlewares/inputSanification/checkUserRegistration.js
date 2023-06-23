@@ -27,7 +27,7 @@ const schema = new Joi.object({
     roleKey: Joi.string()
 })
 
-function isUserRegistrationValid(req, res, next) {
+function checkUserRegistration(req, res, next) {
     const isValid = schema.validate(req.body);
 
     if (isValid.error) {
@@ -37,4 +37,4 @@ function isUserRegistrationValid(req, res, next) {
     next();
 }
 
-module.exports = isUserRegistrationValid;
+module.exports = checkUserRegistration;

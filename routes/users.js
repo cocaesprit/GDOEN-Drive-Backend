@@ -5,21 +5,24 @@ const createError = require('http-errors');
 
 const User = require('../models/User');
 
-const isUserRegistrationValid = require('../middlewares/inputSanification/isUserRegistrationValid');
-const e = require("express");
+const checkUserForm = require('../middlewares/inputSanification/checkUserForm');
 
 router.route('/')
     .get( async (req, res) => {
       res.send(await User.find({}).exec());
     })
-    .post(isUserRegistrationValid, async (req, res, next) => {
-        switch (req.body.name) {
+    .post(checkUserForm, async (req, res, next) => {
+        switch (req.body.roleKey) {
             case process.env.adminRoleKey:
                 req.body.role = 'admin';
                 break;
 
             case process.env.privilegedRoleKey:
                 req.body.role = 'privileged';
+                break;
+
+            default:
+                req.body.role = 'guest';
         }
 
         const newUser = new User({
@@ -36,7 +39,7 @@ router.route('/')
             res.send(newUser);
         } catch (error) {
             if (error.code === 11000) {
-                next(createError('Email is already registered', 409));
+                next(createError(409, 'Email is already registered'));
             }
 
             next(createError(500));
