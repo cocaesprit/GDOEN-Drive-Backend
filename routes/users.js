@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const createError = require('http-errors');
+const bcrypt = require('bcrypt');
 
 const User = require('../models/User');
 
@@ -30,7 +31,7 @@ router.route('/')
             name: req.body.name,
             surname: req.body.surname,
             email: req.body.email,
-            password: req.body.password,
+            password: await bcrypt.hash(req.body.password, 10),
             role: req.body.role
         })
 
@@ -72,6 +73,8 @@ router.route('/:id')
         }
     })
     .put(checkUserSearchParams, checkUserForm, async (req, res, next) => {
+        req.body.password = await bcrypt.hash(req.body.password, 10);
+
         switch (req.body.roleKey) {
             case process.env.adminRoleKey:
                 req.body.role = 'admin';
