@@ -8,10 +8,22 @@ const User = require('../models/User');
 
 const checkUserForm = require('../middlewares/inputSanification/checkUserForm');
 const checkUserSearchParams = require('../middlewares/inputSanification/checkUserSearchParams');
+const checkUserSearchQueries = require('../middlewares/inputSanification/checkUserSearchQueries');
 
 router.route('/')
-    .get( async (req, res) => {
-      res.send(await User.find({}).exec());
+    .get(checkUserSearchQueries, async (req, res, next) => {
+      try {
+          const users = await User.find(req.query).exec();
+
+          if (users.length === 0) {
+              next(createError(404));
+          } else {
+              res.send(users);
+          }
+
+      } catch (error) {
+          next(createError(500, error));
+      }
     })
     .post(checkUserForm, async (req, res, next) => {
         switch (req.body.roleKey) {
