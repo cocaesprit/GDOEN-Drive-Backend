@@ -3,6 +3,10 @@ GET http://{{host}}:{{port}}/users
 Accept: application/json
 
 
+### Get users filtering results
+GET http://{{host}}:{{port}}/users?role=privileged
+
+
 ### Get d1.andrea@icloud.com
 GET http://{{host}}:{{port}}/users/{{andreasID}}
 Accept: application/json

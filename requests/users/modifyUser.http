@@ -8,7 +8,7 @@ Content-Type: application/json
   "surname": "Boccia",
   "email": "d1.andrea@icloud.com",
   "password": "{{$random.alphanumeric(20)}}",
-  "roleKey": "pweo"
+  "roleKey": "wineHQ88"
 }
 
 > {%

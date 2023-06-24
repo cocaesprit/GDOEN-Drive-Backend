@@ -8,11 +8,28 @@ Content-Type: application/json
   "surname": "Boccia",
   "email": "d1.andrea@icloud.com",
   "password": "{{$random.alphanumeric(20)}}",
-  "roleKey": "wineHQ88"
+  "roleKey": "wine"
 }
 
 > {%
     client.global.set('andreasID', response.body._id);
     client.global.set('andreasPassword', JSON.parse(request.body()).password);
+%}
+
+### Create john@carmack.com
+POST http://{{host}}:{{port}}/users
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "John",
+  "surname": "Carmack",
+  "email": "john@carmack.com",
+  "password": "{{$random.alphanumeric(20)}}"
+}
+
+> {%
+    client.global.set('johnsID', response.body._id);
+    client.global.set('johnsPassword', JSON.parse(request.body()).password);
 %}
 
