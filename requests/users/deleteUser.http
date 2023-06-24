@@ -1,0 +1,8 @@
+### Delete all users
+DELETE http://{{host}}:{{port}}/users
+Accept: application/json
+
+
+### Delete d1.andrea@icloud.com
+DELETE http://{{host}}:{{port}}/users/{{andreasID}}
+Accept: application/json
