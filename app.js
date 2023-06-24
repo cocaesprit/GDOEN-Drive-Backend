@@ -29,14 +29,23 @@ app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
+    console.error(err);
 
-  res.send({ message: err.message });
+    res.status(err.status || 500);
+
+    // If status code is 500 provide error message to client only in development
+    if (err.status !== 500) {
+        res.send({ message: err.message });
+    } else if (process.env.NODE_ENV === 'development') {
+        res.send(err.message);
+    } else {
+        res.send({ message: 'Internal server error' });
+    }
 });
 
 module.exports = app;

@@ -31,7 +31,7 @@ function checkUserForm(req, res, next) {
     const isValid = schema.validate(req.body);
 
     if (isValid.error) {
-        next(createError(isValid.error.details[0].message, 400));
+        next(createError(400, isValid.error.details[0].message));
     }
 
     next();

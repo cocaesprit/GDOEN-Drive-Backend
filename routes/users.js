@@ -44,7 +44,7 @@ router.route('/')
                 next(createError(409, 'Email is already registered'));
             }
 
-            next(createError(500));
+            next(createError(500, error));
         }
     })
     .delete( async (req, res, next) => {
@@ -53,7 +53,7 @@ router.route('/')
 
             res.sendStatus(204);
         } catch (error) {
-            next(createError(500));
+            next(createError(500, error));
         }
     })
 
@@ -69,7 +69,7 @@ router.route('/:id')
             }
 
         } catch (error) {
-            next(createError(500));
+            next(createError(500, error));
         }
     })
     .put(checkUserSearchParams, checkUserForm, async (req, res, next) => {
@@ -98,7 +98,7 @@ router.route('/:id')
             }
 
         } catch (error) {
-            next(createError(500));
+            next(createError(500, error));
         }
     })
     .delete(checkUserSearchParams, async (req, res, next) => {
@@ -112,7 +112,7 @@ router.route('/:id')
             }
 
         } catch (error) {
-            next(createError(500));
+            next(createError(500, error));
         }
     })
 
