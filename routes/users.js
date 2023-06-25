@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-
 const createError = require('http-errors');
 const bcrypt = require('bcrypt');
 
 const User = require('../models/User');
 
-const checkUserForm = require('../middlewares/inputSanification/checkUserForm');
-const checkUserSearchParams = require('../middlewares/inputSanification/checkUserSearchParams');
-const checkUserSearchQueries = require('../middlewares/inputSanification/checkUserSearchQueries');
+const checkUserForm = require('../middlewares/inputSanitization/checkUserForm');
+const isValidID = require('../middlewares/inputSanitization/isValidID');
+const checkUserSearchQueries = require('../middlewares/inputSanitization/checkUserSearchQueries');
+const sendUser = require('../middlewares/outputSanitization/sendUser');
 
 router.route('/')
     .get(checkUserSearchQueries, async (req, res, next) => {
@@ -17,14 +17,15 @@ router.route('/')
 
           if (users.length === 0) {
               next(createError(404));
-          } else {
-              res.send(users);
           }
+
+          res.toSend = users;
+          next();
 
       } catch (error) {
           next(createError(500, error));
       }
-    })
+    }, sendUser)
     .post(checkUserForm, async (req, res, next) => {
         switch (req.body.roleKey) {
             case process.env.adminRoleKey:
@@ -50,7 +51,9 @@ router.route('/')
         try {
             await newUser.save();
 
-            res.send(newUser);
+            res.toSend = newUser;
+            next();
+
         } catch (error) {
             if (error.code === 11000) {
                 next(createError(409, 'Email is already registered'));
@@ -58,33 +61,35 @@ router.route('/')
 
             next(createError(500, error));
         }
-    })
+    }, sendUser)
     .delete( async (req, res, next) => {
         try {
             await User.deleteMany({}).exec();
 
             res.sendStatus(204);
+
         } catch (error) {
             next(createError(500, error));
         }
     })
 
 router.route('/:id')
-    .get(checkUserSearchParams, async (req, res, next) => {
+    .get(isValidID, async (req, res, next) => {
         try {
             const user = await User.findById(req.params.id).exec();
 
             if (!user) {
                 next(createError(404));
-            } else {
-                res.send(user);
             }
+
+            res.toSend = user;
+            next();
 
         } catch (error) {
             next(createError(500, error));
         }
-    })
-    .put(checkUserSearchParams, checkUserForm, async (req, res, next) => {
+    }, sendUser)
+    .put(isValidID, checkUserForm, async (req, res, next) => {
         req.body.password = await bcrypt.hash(req.body.password, 10);
 
         switch (req.body.roleKey) {
@@ -105,23 +110,24 @@ router.route('/:id')
 
             if (!modifiedUser) {
                 next(createError(404));
-            } else {
-                res.send(modifiedUser);
             }
+
+            res.toSend = modifiedUser;
+            next();
 
         } catch (error) {
             next(createError(500, error));
         }
-    })
-    .delete(checkUserSearchParams, async (req, res, next) => {
+    }, sendUser)
+    .delete(isValidID, async (req, res, next) => {
         try {
             const removedUser = await User.findByIdAndRemove(req.params.id).exec();
 
             if (!removedUser) {
                 next(createError(404));
-            } else {
-                res.sendStatus(204);
             }
+
+            res.sendStatus(204);
 
         } catch (error) {
             next(createError(500, error));
