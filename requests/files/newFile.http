@@ -1,0 +1,25 @@
+### Upload urandom.txt
+POST http://{{host}}:{{port}}/files
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="urandom"; filename="urandom.txt"
+
+< /Users/andrea/Downloads/urandom.txt
+--boundary--
+
+> {% client.global.set('urandomsID', response.body._id) %}
+
+
+### Upload cat.jpg
+POST http://{{host}}:{{port}}/files
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="urandom"; filename="cat.jpg"
+
+< /Users/andrea/Downloads/cat.jpg
+--boundary--
+
+> {% client.global.set('catsID', response.body._id) %}
+

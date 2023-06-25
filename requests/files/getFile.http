@@ -1,0 +1,12 @@
+### Get all files
+GET http://{{host}}:{{port}}/files
+Accept: application/json
+
+
+### Get files filtering results
+GET http://{{host}}:{{port}}/files?originalName=cat.jpg
+
+
+### Get urandom.txt
+GET http://{{host}}:{{port}}/files/{{urandomsID}}
+Accept: application/json

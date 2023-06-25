@@ -13,6 +13,7 @@ mongoose.connect(process.env.mongoURL)
     })
 
 const usersRouter = require('./routes/users');
+const filesRouter = require('./routes/files');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use( (req, res, next) => {
 });
 
 app.use('/users', usersRouter);
+app.use('/files', filesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -42,7 +44,7 @@ app.use(function(err, req, res, next) {
     if (err.status !== 500) {
         res.send({ message: err.message });
     } else if (process.env.NODE_ENV === 'development') {
-        res.send(err.message);
+        res.send({ message: err.message });
     } else {
         res.send({ message: 'Internal server error' });
     }

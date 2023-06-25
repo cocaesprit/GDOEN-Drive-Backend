@@ -1,0 +1,8 @@
+### Delete all files
+DELETE http://{{host}}:{{port}}/files
+Accept: application/json
+
+
+### Delete urandom.txt
+DELETE http://{{host}}:{{port}}/files/{{urandomsID}}
+Accept: application/json
