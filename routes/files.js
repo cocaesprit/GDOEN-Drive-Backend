@@ -9,11 +9,12 @@ const checkFileForm = require("../middlewares/inputSanitization/checkFileForm");
 const isValidID = require('../middlewares/inputSanitization/isValidID');
 const checkFileSearchQueries = require('../middlewares/inputSanitization/checkFileSearchQueries');
 const sendFile = require('../middlewares/outputSanitization/sendFile');
+const isLogged = require('../middlewares/checkAuth/isLogged');
 
 const upload = multer({ dest: '/Users/andrea/Documents/Code/Web Development/GDOEN Drive Backend/uploads' });
 
 router.route('/')
-    .get(checkFileSearchQueries, async (req, res, next) => {
+    .get(isLogged, checkFileSearchQueries, async (req, res, next) => {
         try {
             // TODO: req.query.maxSize should be used with $lwi
             const files = await File.find(req.query).exec();
@@ -29,7 +30,7 @@ router.route('/')
             next(createError(500, error));
         }
     }, sendFile)
-    .post(upload.any(), async (req, res, next) => {
+    .post(isLogged, upload.any(), async (req, res, next) => {
         let newFiles = [];
 
         for (let i = 0; i < req.files.length; ++i) {
@@ -54,7 +55,7 @@ router.route('/')
         res.toSend = newFiles;
         next();
     }, sendFile)
-    .delete( async (req, res, next) => {
+    .delete(isLogged, async (req, res, next) => {
         try {
             await File.deleteMany({}).exec();
 
@@ -66,7 +67,7 @@ router.route('/')
     })
 
 router.route('/:id')
-    .get(isValidID, async (req, res, next) => {
+    .get(isLogged, isValidID, async (req, res, next) => {
         try {
             const file = await File.findById(req.params.id).exec();
 
@@ -81,7 +82,7 @@ router.route('/:id')
             next(createError(500, error));
         }
     }, sendFile)
-    .put(isValidID, checkFileForm, async (req, res, next) => {
+    .put(isLogged, isValidID, checkFileForm, async (req, res, next) => {
         try {
             const modifiedFile = await File.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).exec();
 
@@ -96,7 +97,7 @@ router.route('/:id')
             next(createError(500, error));
         }
     }, sendFile)
-    .delete(isValidID, async (req, res, next) => {
+    .delete(isLogged, isValidID, async (req, res, next) => {
         try {
             const removedFile = await File.findByIdAndRemove(req.params.id).exec();
 
