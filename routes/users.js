@@ -12,9 +12,11 @@ const checkUserSearchQueries = require('../middlewares/inputSanitization/checkUs
 const sendUser = require('../middlewares/outputSanitization/sendUser');
 const checkUserLogin = require('../middlewares/inputSanitization/checkUserLogin');
 const isLogged = require('../middlewares/checkAuth/isLogged');
+const isAdmin = require('../middlewares/checkAuth/isAdmin');
+const matchUser = require('../middlewares/checkAuth/matchUser');
 
 router.route('/')
-    .get(checkUserSearchQueries, async (req, res, next) => {
+    .get(checkUserSearchQueries, isLogged, async (req, res, next) => {
       try {
           const users = await User.find(req.query).exec();
 
@@ -65,7 +67,7 @@ router.route('/')
             next(createError(500, error));
         }
     }, sendUser)
-    .delete( async (req, res, next) => {
+    .delete(isAdmin, async (req, res, next) => {
         try {
             await User.deleteMany({}).exec();
 
@@ -88,7 +90,7 @@ router.post('/profile', isLogged, (req, res, next) => {
 }, sendUser)
 
 router.route('/:id')
-    .get(isValidID, async (req, res, next) => {
+    .get(isValidID, isLogged, async (req, res, next) => {
         try {
             const user = await User.findById(req.params.id).exec();
 
@@ -103,7 +105,7 @@ router.route('/:id')
             next(createError(500, error));
         }
     }, sendUser)
-    .put(isValidID, checkUserForm, async (req, res, next) => {
+    .put(isValidID, matchUser, checkUserForm, async (req, res, next) => {
         req.body.password = await bcrypt.hash(req.body.password, 10);
 
         switch (req.body.roleKey) {
@@ -133,7 +135,7 @@ router.route('/:id')
             next(createError(500, error));
         }
     }, sendUser)
-    .delete(isValidID, async (req, res, next) => {
+    .delete(isValidID, matchUser, async (req, res, next) => {
         try {
             const removedUser = await User.findByIdAndRemove(req.params.id).exec();
 
