@@ -10,3 +10,8 @@ GET http://{{host}}:{{port}}/users?name=Andrea
 ### Get d1.andrea@icloud.com
 GET http://{{host}}:{{port}}/users/{{andreasID}}
 Accept: application/json
+
+
+### Get current logged user
+POST http://{{host}}:{{port}}/users/profile
+Accept: application/json

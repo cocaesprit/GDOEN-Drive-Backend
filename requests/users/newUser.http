@@ -17,6 +17,7 @@ Content-Type: application/json
     client.global.set('andreasPassword', JSON.parse(request.body()).password);
 %}
 
+
 ### Create john@carmack.com
 POST http://{{host}}:{{port}}/users
 Accept: application/json
@@ -31,6 +32,7 @@ Content-Type: application/json
 
 > {%
     client.global.set('johnsID', response.body._id);
+    client.global.set('johnsEmail', response.body.email);
     client.global.set('johnsPassword', JSON.parse(request.body()).password);
 %}
 

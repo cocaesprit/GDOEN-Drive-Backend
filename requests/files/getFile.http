@@ -4,7 +4,7 @@ Accept: application/json
 
 
 ### Get files filtering results
-GET http://{{host}}:{{port}}/files?originalName=cat.jpg
+GET http://{{host}}:{{port}}/files?maxSize=53754
 
 
 ### Get urandom.txt

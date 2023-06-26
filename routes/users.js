@@ -115,7 +115,7 @@ router.route('/:id')
         }
 
         try {
-            const modifiedUser = await User.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).select('-password').exec();
+            const modifiedUser = await User.findByIdAndUpdate(req.params.id, req.body, {returnDocument: 'after'}).select('-password').exec();
 
             if (!modifiedUser) {
                 next(createError(404));
