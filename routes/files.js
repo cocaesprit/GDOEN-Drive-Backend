@@ -7,28 +7,26 @@ const File = require('../models/File');
 
 const checkFileForm = require("../middlewares/inputSanitization/checkFileForm");
 const isValidID = require('../middlewares/inputSanitization/isValidID');
-const checkFileSearchQueries = require('../middlewares/inputSanitization/checkFileSearchQueries');
-const sendFile = require('../middlewares/outputSanitization/sendFile');
+const handleFileSearchQueries = require('../middlewares/inputSanitization/handleFileSearchQueries');
 const isLogged = require('../middlewares/checkAuth/isLogged');
 
 const upload = multer({ dest: '/Users/andrea/Documents/Code/Web Development/GDOEN Drive Backend/uploads' });
 
 router.route('/')
-    .get(isLogged, checkFileSearchQueries, async (req, res, next) => {
+    .get(isLogged, handleFileSearchQueries, async (req, res, next) => {
         try {
-            const files = await File.find(req.query).exec();
+            const files = await File.find(req.query).select('originalName size owner _id').exec();
 
             if (files.length === 0) {
                 next(createError(404));
             }
 
-            res.toSend = files;
-            next();
+            res.send(files);
 
         } catch (error) {
             next(createError(500, error));
         }
-    }, sendFile)
+    })
     .post(isLogged, upload.any(), async (req, res, next) => {
         let newFiles = [];
 
@@ -52,9 +50,12 @@ router.route('/')
             }
         }
 
-        res.toSend = newFiles;
-        next();
-    }, sendFile)
+        for (let i = 0; i < newFiles.length; ++i) {
+            newFiles[i] = stripFile(newFiles[i]);
+        }
+
+        res.send(newFiles);
+    })
     .delete(isLogged, async (req, res, next) => {
         try {
             await File.deleteMany({}).exec();
@@ -69,34 +70,32 @@ router.route('/')
 router.route('/:id')
     .get(isLogged, isValidID, async (req, res, next) => {
         try {
-            const file = await File.findById(req.params.id).exec();
+            const file = await File.findById(req.params.id).select('originalName size owner _id').exec();
 
             if (!file) {
                 next(createError(404));
             }
 
-            res.toSend = file;
-            next();
+            res.send(file);
 
         } catch (error) {
             next(createError(500, error));
         }
-    }, sendFile)
+    })
     .put(isLogged, isValidID, checkFileForm, async (req, res, next) => {
         try {
-            const modifiedFile = await File.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).exec();
+            const modifiedFile = await File.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).select('originalName size owner _id').exec();
 
             if (!modifiedFile) {
                 next(createError(404));
             }
 
-            res.toSend = modifiedFile;
-            next();
+            res.send(modifiedFile);
 
         } catch (error) {
             next(createError(500, error));
         }
-    }, sendFile)
+    })
     .delete(isLogged, isValidID, async (req, res, next) => {
         try {
             const removedFile = await File.findByIdAndRemove(req.params.id).exec();
@@ -111,5 +110,15 @@ router.route('/:id')
             next(createError(500, error));
         }
     })
+
+function stripFile(file) {
+    return {
+        originalName: file.originalName,
+        size: file.size,
+        owner: file.owner,
+        _id: file._id
+    }
+}
+
 
 module.exports = router;

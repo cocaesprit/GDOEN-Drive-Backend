@@ -9,7 +9,6 @@ const User = require('../models/User');
 const checkUserForm = require('../middlewares/inputSanitization/checkUserForm');
 const isValidID = require('../middlewares/inputSanitization/isValidID');
 const checkUserSearchQueries = require('../middlewares/inputSanitization/checkUserSearchQueries');
-const sendUser = require('../middlewares/outputSanitization/sendUser');
 const checkUserLogin = require('../middlewares/inputSanitization/checkUserLogin');
 const isLogged = require('../middlewares/checkAuth/isLogged');
 const isAdmin = require('../middlewares/checkAuth/isAdmin');
@@ -18,19 +17,18 @@ const matchUser = require('../middlewares/checkAuth/matchUser');
 router.route('/')
     .get(checkUserSearchQueries, isLogged, async (req, res, next) => {
       try {
-          const users = await User.find(req.query).exec();
+          const users = await User.find(req.query).select('-password').exec();
 
           if (users.length === 0) {
               next(createError(404));
           }
 
-          res.toSend = users;
-          next();
+          res.send(users)
 
       } catch (error) {
           next(createError(500, error));
       }
-    }, sendUser)
+    })
     .post(checkUserForm, async (req, res, next) => {
         switch (req.body.roleKey) {
             case process.env.adminRoleKey:
@@ -56,9 +54,7 @@ router.route('/')
         try {
             await newUser.save();
 
-            res.toSend = newUser;
-            next();
-
+            res.send(stripUser(newUser));
         } catch (error) {
             if (error.code === 11000) {
                 next(createError(409, 'Email is already registered'));
@@ -66,7 +62,7 @@ router.route('/')
 
             next(createError(500, error));
         }
-    }, sendUser)
+    })
     .delete(isAdmin, async (req, res, next) => {
         try {
             await User.deleteMany({}).exec();
@@ -80,31 +76,28 @@ router.route('/')
 
 router.post('/login', checkUserLogin, passport.authenticate('local'), (req, res, next) => {
     // res.send({ message: 'Logged in', user: req.user });
-    res.toSend = req.user;
-    next();
-}, sendUser)
+    res.send(stripUser(req.user));
+})
 
 router.post('/profile', isLogged, (req, res, next) => {
-    res.toSend = req.user;
-    next();
-}, sendUser)
+    res.send(stripUser(req.user));
+})
 
 router.route('/:id')
     .get(isValidID, isLogged, async (req, res, next) => {
         try {
-            const user = await User.findById(req.params.id).exec();
+            const user = await User.findById(req.params.id).select('-password').exec();
 
             if (!user) {
                 next(createError(404));
             }
 
-            res.toSend = user;
-            next();
+            res.send(user);
 
         } catch (error) {
             next(createError(500, error));
         }
-    }, sendUser)
+    })
     .put(isValidID, matchUser, checkUserForm, async (req, res, next) => {
         req.body.password = await bcrypt.hash(req.body.password, 10);
 
@@ -122,19 +115,18 @@ router.route('/:id')
         }
 
         try {
-            const modifiedUser = await User.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).exec();
+            const modifiedUser = await User.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).select('-password').exec();
 
             if (!modifiedUser) {
                 next(createError(404));
             }
 
-            res.toSend = modifiedUser;
-            next();
+            res.send(modifiedUser);
 
         } catch (error) {
             next(createError(500, error));
         }
-    }, sendUser)
+    })
     .delete(isValidID, matchUser, async (req, res, next) => {
         try {
             const removedUser = await User.findByIdAndRemove(req.params.id).exec();
@@ -149,5 +141,16 @@ router.route('/:id')
             next(createError(500, error));
         }
     })
+
+function stripUser(user) {
+    return {
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        role: user.role,
+        registrationDate: user.registrationDate,
+        _id: user._id
+    };
+}
 
 module.exports = router;
