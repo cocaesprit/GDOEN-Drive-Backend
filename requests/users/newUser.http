@@ -13,6 +13,7 @@ Content-Type: application/json
 
 > {%
     client.global.set('andreasID', response.body._id);
+    client.global.set('andreasEmail', response.body.email);
     client.global.set('andreasPassword', JSON.parse(request.body()).password);
 %}
 

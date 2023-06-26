@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const createError = require('http-errors');
 const bcrypt = require('bcrypt');
+const passport = require('../passport');
 
 const User = require('../models/User');
 
@@ -9,6 +10,8 @@ const checkUserForm = require('../middlewares/inputSanitization/checkUserForm');
 const isValidID = require('../middlewares/inputSanitization/isValidID');
 const checkUserSearchQueries = require('../middlewares/inputSanitization/checkUserSearchQueries');
 const sendUser = require('../middlewares/outputSanitization/sendUser');
+const checkUserLogin = require('../middlewares/inputSanitization/checkUserLogin');
+const isLogged = require('../middlewares/checkAuth/isLogged');
 
 router.route('/')
     .get(checkUserSearchQueries, async (req, res, next) => {
@@ -72,6 +75,17 @@ router.route('/')
             next(createError(500, error));
         }
     })
+
+router.post('/login', checkUserLogin, passport.authenticate('local'), (req, res, next) => {
+    // res.send({ message: 'Logged in', user: req.user });
+    res.toSend = req.user;
+    next();
+}, sendUser)
+
+router.post('/profile', isLogged, (req, res, next) => {
+    res.toSend = req.user;
+    next();
+}, sendUser)
 
 router.route('/:id')
     .get(isValidID, async (req, res, next) => {

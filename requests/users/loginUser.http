@@ -1,0 +1,92 @@
+### Login with d1.andrea@icloud.com
+POST http://{{host}}:{{port}}/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "{{andreasEmail}}",
+  "password": "{{andreasPassword}}"
+}
+
+<> 2023-06-26T163301.200.json
+<> 2023-06-26T163158.200.json
+<> 2023-06-26T162955.200.json
+<> 2023-06-26T162912.200.json
+<> 2023-06-26T162819.500.json
+<> 2023-06-26T162744.200.json
+<> 2023-06-26T162729.500.json
+<> 2023-06-26T162715.200.json
+<> 2023-06-26T162626.200.json
+<> 2023-06-26T162614.200.json
+<> 2023-06-26T162451.200.json
+<> 2023-06-26T162420.200.json
+<> 2023-06-26T162416.200.json
+<> 2023-06-26T162327.200.json
+<> 2023-06-26T162311.200.json
+<> 2023-06-26T162239.200.json
+<> 2023-06-26T155508.200.json
+<> 2023-06-26T155452.200.json
+<> 2023-06-26T155106.200.json
+<> 2023-06-26T155038.200.json
+<> 2023-06-26T154943.200.json
+<> 2023-06-26T154921.200.json
+<> 2023-06-26T154902.200.json
+<> 2023-06-26T154129.200.json
+<> 2023-06-26T152733.200.json
+<> 2023-06-26T151220.200.json
+<> 2023-06-26T151212.200.json
+
+### Login with wrong credentials
+POST http://{{host}}:{{port}}/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "{{$random.email}}",
+  "password": "{{$random.alphanumeric(20)}}"
+}
+
+<> 2023-06-26T152138.401.json
+<> 2023-06-26T152042.401.json
+<> 2023-06-26T152025.401.json
+<> 2023-06-26T151914.401.json
+<> 2023-06-26T151749.401.json
+<> 2023-06-26T151723.401.json
+<> 2023-06-26T151640.401.json
+<> 2023-06-26T151606.401.json
+<> 2023-06-26T151551.401.json
+<> 2023-06-26T151531.401.json
+<> 2023-06-26T151517.401.json
+<> 2023-06-26T151411.401.json
+<> 2023-06-26T151346.401.json
+<> 2023-06-26T151226.401.json
+<> 2023-06-26T151137.401.json
+<> 2023-06-26T150855.401.json
+
+
+### Login with bad formatted request
+POST http://{{host}}:{{port}}/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "{{$random.email}}",
+  "password": "{{$random.integer(10)}}"
+}
+
+<> 2023-06-26T152133.400.json
+<> 2023-06-26T151757.400.json
+
+
+### Get current logged user
+POST http://{{host}}:{{port}}/users/profile
+Accept: application/json
+
+<> 2023-06-26T163304.200.json
+<> 2023-06-26T163251.401.json
+<> 2023-06-26T163218.200.json
+<> 2023-06-26T152740.200.json
+<> 2023-06-26T152720.401.json
+
+
+###

@@ -4,6 +4,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const debug = require('debug')('gdoen-drive-backend:server');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const passport = require('./passport');
 
 mongoose.connect(process.env.mongoURL)
     .then( () => debug('Connected to DB'))
@@ -14,6 +16,7 @@ mongoose.connect(process.env.mongoURL)
 
 const usersRouter = require('./routes/users');
 const filesRouter = require('./routes/files');
+const e = require("express");
 
 const app = express();
 
@@ -25,6 +28,13 @@ app.use( (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
   next();
 });
+app.use(session({
+    secret: process.env.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }
+}));
+app.use(passport.session());
 
 app.use('/users', usersRouter);
 app.use('/files', filesRouter);
@@ -36,7 +46,9 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-    console.error(err);
+    if (process.env.NODE_ENV === 'development') {
+        console.error(err);
+    }
 
     res.status(err.status || 500);
 
