@@ -7,15 +7,11 @@ function sendFile(req, res, next) {
         }
 
         res.send(res.toSend);
-        next();
-    }
-
-    if (typeof res.toSend == 'object') {
+    } else if (typeof res.toSend == 'object') {
         res.send(stripFile(res.toSend));
-        next();
+    } else {
+        next(createError(500, `Cannot send ${typeof res.toSend} to client`));
     }
-
-    next(createError(500, `Cannot send ${typeof res.toSend} to client`));
 }
 
 function stripFile(file) {

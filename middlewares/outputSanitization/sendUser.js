@@ -7,15 +7,11 @@ function sendUser(req, res, next) {
         }
 
         res.send(res.toSend);
-        next();
-    }
-
-    if (typeof res.toSend == 'object') {
+    } else if (typeof res.toSend == 'object') {
         res.send(stripUser(res.toSend));
-        next();
+    } else {
+        next(createError(500, `Cannot send ${typeof res.toSend} to client`));
     }
-
-    next(createError(500, `Cannot send ${typeof res.toSend} to client`));
 }
 
 function stripUser(user) {
