@@ -58,7 +58,7 @@ router.route('/')
     })
     .delete(isLogged, async (req, res, next) => {
         try {
-            await File.deleteMany({}).exec();
+            await File.deleteMany({ owner: req.user._id }).exec();
 
             res.sendStatus(204);
 
@@ -70,7 +70,7 @@ router.route('/')
 router.route('/:id')
     .get(isLogged, isValidID, async (req, res, next) => {
         try {
-            const file = await File.findById(req.params.id).select('originalName size owner _id').exec();
+            const file = await File.findOne({ owner: req.user._id, id: req.params.id }).select('originalName size owner _id').exec();
 
             if (!file) {
                 next(createError(404));
@@ -84,7 +84,9 @@ router.route('/:id')
     })
     .put(isLogged, isValidID, checkFileForm, async (req, res, next) => {
         try {
-            const modifiedFile = await File.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).select('originalName size owner _id').exec();
+            const modifiedFile = await File.updateOne({ owner: req.user._id, id: req.params.id }, req.body, { returnDocument: 'after' })
+                .select('originalName size owner _id')
+                .exec();
 
             if (!modifiedFile) {
                 next(createError(404));
@@ -98,7 +100,7 @@ router.route('/:id')
     })
     .delete(isLogged, isValidID, async (req, res, next) => {
         try {
-            const removedFile = await File.findByIdAndRemove(req.params.id).exec();
+            const removedFile = await File.deleteOne({ owner: req.user._id, id: req.params.id }).exec();
 
             if (!removedFile) {
                 next(createError(404));

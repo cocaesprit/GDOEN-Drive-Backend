@@ -5,7 +5,8 @@ const fileSchema = new Schema({
     destination: { type: String, required: true },
     fileName: { type: String, required: true, unique: true },
     path: { type: String, required: true, unique: true },
-    size: { type: Number, required: true }
+    size: { type: Number, required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User' }
 })
 
 const File = mongoose.model('File', fileSchema);

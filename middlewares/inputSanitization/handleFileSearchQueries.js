@@ -8,12 +8,14 @@ const schema = Joi.object({
     _id: Joi.string(),
 })
 
-function checkFileSearchQueries(req, res, next) {
+function handleFileSearchQueries(req, res, next) {
     const isValid = schema.validate(req.query);
 
     if (isValid.error) {
         next(createError(400, isValid.error.details[0].message));
     }
+
+    req.query.owner = req.user._id;
 
     if (req.query.maxSize) {
         req.query.size = { $lte: req.query.maxSize };
@@ -23,4 +25,4 @@ function checkFileSearchQueries(req, res, next) {
     next();
 }
 
-module.exports = checkFileSearchQueries;
+module.exports = handleFileSearchQueries;
