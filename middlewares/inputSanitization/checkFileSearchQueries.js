@@ -15,6 +15,11 @@ function checkFileSearchQueries(req, res, next) {
         next(createError(400, isValid.error.details[0].message));
     }
 
+    if (req.query.maxSize) {
+        req.query.size = { $lte: req.query.maxSize };
+        delete req.query.maxSize;
+    }
+
     next();
 }
 

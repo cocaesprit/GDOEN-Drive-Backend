@@ -16,7 +16,6 @@ const upload = multer({ dest: '/Users/andrea/Documents/Code/Web Development/GDOE
 router.route('/')
     .get(isLogged, checkFileSearchQueries, async (req, res, next) => {
         try {
-            // TODO: req.query.maxSize should be used with $lwi
             const files = await File.find(req.query).exec();
 
             if (files.length === 0) {
@@ -39,7 +38,8 @@ router.route('/')
                 destination: req.files[i].destination,
                 fileName: req.files[i].filename,
                 path: req.files[i].path,
-                size: req.files[i].size
+                size: req.files[i].size,
+                owner: req.user._id
             })
 
             try {
