@@ -5,7 +5,7 @@ const userSchema = new Schema({
     surname: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, required: true, default: 'guest' },
+    isAdmin: { type: Boolean, required: true, default: false },
     registrationDate: { type: Date, required: true, default: Date.now() },
 })
 

@@ -6,7 +6,7 @@ const schema = Joi.object({
     name: Joi.string(),
     surname: Joi.string(),
     email: Joi.string().email(),
-    role: Joi.string()
+    isAdmin: Joi.boolean()
 })
 
 function checkUserSearchQueries(req, res, next) {

@@ -17,7 +17,7 @@ const matchUser = require('../middlewares/checkAuth/matchUser');
 router.route('/')
     .get(checkUserSearchQueries, isLogged, async (req, res, next) => {
       try {
-          const users = await User.find(req.query).select('-password').exec();
+          const users = await User.find(req.query).select('-password -isAdmin').exec();
 
           if (users.length === 0) {
               next(createError(404));
@@ -30,17 +30,8 @@ router.route('/')
       }
     })
     .post(checkUserForm, async (req, res, next) => {
-        switch (req.body.roleKey) {
-            case process.env.adminRoleKey || 'wineHQ':
-                req.body.role = 'admin';
-                break;
-
-            case process.env.privilegedRoleKey || 'wine':
-                req.body.role = 'privileged';
-                break;
-
-            default:
-                req.body.role = 'guest';
+        if (process.env.roleKey === (process.env.adminRoleKey || 'wineHQ')) {
+            req.body.isAdmin = true;
         }
 
         const newUser = new User({
@@ -48,7 +39,7 @@ router.route('/')
             surname: req.body.surname,
             email: req.body.email,
             password: await bcrypt.hash(req.body.password, 10),
-            role: req.body.role
+            isAdmin: req.body.isAdmin
         })
 
         try {
@@ -101,21 +92,12 @@ router.route('/:id')
     .put(isValidID, matchUser, checkUserForm, async (req, res, next) => {
         req.body.password = await bcrypt.hash(req.body.password, 10);
 
-        switch (req.body.roleKey) {
-            case process.env.adminRoleKey || 'wineHQ':
-                req.body.role = 'admin';
-                break;
-
-            case process.env.privilegedRoleKey || 'wine':
-                req.body.role = 'privileged';
-                break;
-
-            default:
-                req.body.role = 'guest';
+        if (process.env.roleKey === (process.env.adminRoleKey || 'wineHQ')) {
+            req.body.isAdmin = true;
         }
 
         try {
-            const modifiedUser = await User.findByIdAndUpdate(req.params.id, req.body, {returnDocument: 'after'}).select('-password').exec();
+            const modifiedUser = await User.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }).select('-password').exec();
 
             if (!modifiedUser) {
                 next(createError(404));
@@ -147,7 +129,7 @@ function stripUser(user) {
         name: user.name,
         surname: user.surname,
         email: user.email,
-        role: user.role,
+        isAdmin: user.isAdmin,
         registrationDate: user.registrationDate,
         _id: user._id
     };
