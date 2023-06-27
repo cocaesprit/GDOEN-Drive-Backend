@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const passport = require('./passport');
 
-mongoose.connect(process.env.mongoURL)
+mongoose.connect(process.env.mongoURL || 'mongodb://localhost/')
     .then( () => debug('Connected to DB'))
     .catch( () => {
       console.error('Couldn\'t connect to DB');
@@ -29,7 +29,7 @@ app.use( (req, res, next) => {
   next();
 });
 app.use(session({
-    secret: process.env.sessionSecret,
+    secret: process.env.sessionSecret || 'whisky',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }

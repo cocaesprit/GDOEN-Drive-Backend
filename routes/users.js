@@ -31,11 +31,11 @@ router.route('/')
     })
     .post(checkUserForm, async (req, res, next) => {
         switch (req.body.roleKey) {
-            case process.env.adminRoleKey:
+            case process.env.adminRoleKey || 'wineHQ':
                 req.body.role = 'admin';
                 break;
 
-            case process.env.privilegedRoleKey:
+            case process.env.privilegedRoleKey || 'wine':
                 req.body.role = 'privileged';
                 break;
 
@@ -102,11 +102,11 @@ router.route('/:id')
         req.body.password = await bcrypt.hash(req.body.password, 10);
 
         switch (req.body.roleKey) {
-            case process.env.adminRoleKey:
+            case process.env.adminRoleKey || 'wineHQ':
                 req.body.role = 'admin';
                 break;
 
-            case process.env.privilegedRoleKey:
+            case process.env.privilegedRoleKey || 'wine':
                 req.body.role = 'privileged';
                 break;
 
